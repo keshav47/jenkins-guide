@@ -90,12 +90,12 @@ pipeline {
       }
     }
 // Doing containers clean-up to avoid conflicts in future builds
-//     stage('CLEAN-UP') {
-//       steps {
-//         sh 'docker stop nodeapp-dev test-image'
-//         sh 'docker system prune -f'
-//         deleteDir()
-//       }
-//     }
-//   }
-// }
+    // stage('CLEAN-UP') {
+    //   steps {
+    //     sh 'docker stop nodeapp-dev test-image'
+    //     sh 'docker system prune -f'
+    //     deleteDir()
+    //   }
+    // }
+  }
+}
