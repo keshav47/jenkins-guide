@@ -9,13 +9,13 @@ pipeline {
       parallel {
         stage('Express Image') {
           steps {
-            sh 'sudo docker build -f express-image/Dockerfile \
+            sh 'docker build -f express-image/Dockerfile \
             -t nodeapp-dev:trunk .'
           }
         }
         stage('Test-Unit Image') {
           steps {
-            sh 'sudo docker build -f test-image/Dockerfile \
+            sh 'docker build -f test-image/Dockerfile \
             -t test-image:latest .'
           }
         }
@@ -31,18 +31,18 @@ pipeline {
       parallel {
         stage('Mocha Tests') {
           steps {
-            sh 'sudo docker run --name nodeapp-dev -d \
+            sh 'docker run --name nodeapp-dev -d \
             -p 9000:9000 nodeapp-dev:trunk'
-            sh 'sudo docker run --name test-image -v $PWD:/JUnit \
+            sh 'docker run --name test-image -v $PWD:/JUnit \
             --link=nodeapp-dev -d -p 9001:9000 \
             test-image:latest'
           }
         }
         stage('Quality Tests') {
           steps {
-            sh 'sudo docker login --username $DOCKER_USR --password $DOCKER_PSW'
-            sh 'sudo docker tag nodeapp-dev:trunk keshav47/nodeapp-dev:latest'
-            sh 'sudo docker push keshav47/nodeapp-dev:latest'
+            sh 'docker login --username $DOCKER_USR --password $DOCKER_PSW'
+            sh 'docker tag nodeapp-dev:trunk keshav47/nodeapp-dev:latest'
+            sh 'docker push keshav47/nodeapp-dev:latest'
           }
         }
       }
@@ -66,17 +66,17 @@ pipeline {
             steps {
                     retry(3) {
                         timeout(time:10, unit: 'MINUTES') {
-                            sh 'sudo docker tag nodeapp-dev:trunk keshav47/nodeapp-prod:latest'
-                            sh 'sudo docker push keshav47/nodeapp-prod:latest'
-                            sh 'sudo docker save keshav47/nodeapp-prod:latest | gzip > nodeapp-prod-golden.tar.gz'
+                            sh 'docker tag nodeapp-dev:trunk keshav47/nodeapp-prod:latest'
+                            sh 'docker push keshav47/nodeapp-prod:latest'
+                            sh 'docker save keshav47/nodeapp-prod:latest | gzip > nodeapp-prod-golden.tar.gz'
                         }
                     }
 
             }
             post {
                 failure {
-                    sh 'sudo docker stop nodeapp-dev test-image'
-                    sh 'sudo docker system prune -f'
+                    sh 'docker stop nodeapp-dev test-image'
+                    sh 'docker system prune -f'
                     deleteDir()
                 }
             }
@@ -92,11 +92,10 @@ pipeline {
 // Doing containers clean-up to avoid conflicts in future builds
     stage('CLEAN-UP') {
       steps {
-        sh 'sudo docker stop nodeapp-dev test-image'
-        sh 'sudo docker system prune -f'
+        sh 'docker stop nodeapp-dev test-image'
+        sh 'docker system prune -f'
         deleteDir()
       }
     }
   }
 }
-
